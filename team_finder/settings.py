@@ -5,11 +5,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # TODO: Создать и заполнить .env, ориентируясь на .env_example
 
-SECRET_KEY = config("DJANGO_SECRET_KEY")
+SECRET_KEY = config("DJANGO_SECRET_KEY", default="team-finder-dev-secret-key")
 
-DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
+DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config(
+    "DJANGO_ALLOWED_HOSTS",
+    default="localhost,127.0.0.1,testserver",
+    cast=lambda value: [host.strip() for host in value.split(",") if host.strip()],
+)
 
 
 # Application definition
@@ -21,6 +25,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "users",
+    "projects",
 ]
 
 MIDDLEWARE = [
@@ -59,11 +65,11 @@ WSGI_APPLICATION = "team_finder.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("POSTGRES_DB"),
-        "USER": config("POSTGRES_USER"),
-        "PASSWORD": config("POSTGRES_PASSWORD"),
+        "NAME": config("POSTGRES_DB", default="team_finder"),
+        "USER": config("POSTGRES_USER", default="team_finder"),
+        "PASSWORD": config("POSTGRES_PASSWORD", default="team_finder"),
         "HOST": config("POSTGRES_HOST", default="localhost"),
-        "PORT": config("POSTGRES_PORT", default=5432, cast=int),
+        "PORT": config("POSTGRES_PORT", default=5436, cast=int),
     }
 }
 
@@ -95,7 +101,7 @@ if not DEBUG:
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
@@ -116,3 +122,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "users.User"
+LOGIN_URL = "/users/login/"
+LOGIN_REDIRECT_URL = "/projects/list"
+LOGOUT_REDIRECT_URL = "/projects/list"
