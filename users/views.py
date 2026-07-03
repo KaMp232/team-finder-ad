@@ -1,4 +1,3 @@
-import json
 from http import HTTPStatus
 
 from django.contrib.auth import login, logout
@@ -7,27 +6,23 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from team_finder.utils import paginate
+from team_finder.constants import (
+    DEFAULT_PAGE_SIZE,
+    PERMISSION_DENIED_MESSAGE,
+    SEARCH_QUERY_PARAM,
+    SKILL_NOT_ATTACHED_MESSAGE,
+    SKILL_NOT_FOUND_MESSAGE,
+    SKILL_QUERY_PARAM,
+    SKILL_REQUIRED_MESSAGE,
+    SKILL_SUGGESTIONS_LIMIT,
+)
+from team_finder.utils import json_error, paginate, request_payload
 
 from .forms import LoginForm, ProfileForm, RegisterForm, UserPasswordChangeForm
 from .models import Skill, User
 from .utils import get_or_create_skill
 
-USERS_PER_PAGE = 12
-SKILL_SUGGESTIONS_LIMIT = 10
-SKILL_QUERY_PARAM = "skill"
-SEARCH_QUERY_PARAM = "q"
-JSON_CONTENT_TYPE = "application/json"
-ERROR_KEY = "error"
 USER_NOT_FOUND_MESSAGE = "User not found."
-SKILL_NOT_FOUND_MESSAGE = "Skill not found."
-PERMISSION_DENIED_MESSAGE = "Permission denied."
-SKILL_REQUIRED_MESSAGE = "skill_id or name is required"
-SKILL_NOT_ATTACHED_MESSAGE = "Skill is not attached"
-
-
-def json_error(message, status):
-    return JsonResponse({ERROR_KEY: message}, status=status)
 
 
 def register(request):
@@ -67,7 +62,7 @@ def user_list(request):
     if active_skill:
         participants = participants.filter(skills__name=active_skill)
     participants = participants.distinct()
-    page_obj, query_prefix = paginate(request, participants, USERS_PER_PAGE)
+    page_obj, query_prefix = paginate(request, participants, DEFAULT_PAGE_SIZE)
     context = {
         "participants": participants,
         "page_obj": page_obj,
@@ -124,15 +119,6 @@ def skill_suggestions(request):
         :SKILL_SUGGESTIONS_LIMIT
     ]
     return JsonResponse(list(skills.values("id", "name")), safe=False)
-
-
-def request_payload(request):
-    if request.content_type == JSON_CONTENT_TYPE:
-        try:
-            return json.loads(request.body.decode() or "{}")
-        except json.JSONDecodeError:
-            return {}
-    return request.POST
 
 
 @login_required(login_url="/users/login/")

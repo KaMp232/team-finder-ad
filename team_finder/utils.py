@@ -1,6 +1,15 @@
+import json
+
 from django.core.paginator import Paginator
+from django.http import JsonResponse
+
+from .constants import ERROR_KEY, JSON_CONTENT_TYPE
 
 PAGE_QUERY_PARAM = "page"
+
+
+def json_error(message, status):
+    return JsonResponse({ERROR_KEY: message}, status=status)
 
 
 def paginate(request, queryset, per_page):
@@ -12,3 +21,12 @@ def paginate(request, queryset, per_page):
     if query_prefix:
         query_prefix += "&"
     return page_obj, query_prefix
+
+
+def request_payload(request):
+    if request.content_type == JSON_CONTENT_TYPE:
+        try:
+            return json.loads(request.body.decode() or "{}")
+        except json.JSONDecodeError:
+            return {}
+    return request.POST
