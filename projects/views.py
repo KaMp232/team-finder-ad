@@ -67,21 +67,27 @@ def project_detail(request, project_id):
 
 @login_required(login_url="/users/login/")
 def create_project(request):
-    if request.method == "POST":
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            project = form.save(commit=False)
-            project.owner = request.user
-            project.save()
-            project.participants.add(request.user)
-            return redirect("projects:detail", project_id=project.id)
-    else:
+    if request.method != "POST":
         form = ProjectForm()
-    return render(
-        request,
-        "projects/create-project.html",
-        {"form": form, "is_edit": False},
-    )
+        return render(
+            request,
+            "projects/create-project.html",
+            {"form": form, "is_edit": False},
+        )
+
+    form = ProjectForm(request.POST)
+    if not form.is_valid():
+        return render(
+            request,
+            "projects/create-project.html",
+            {"form": form, "is_edit": False},
+        )
+
+    project = form.save(commit=False)
+    project.owner = request.user
+    project.save()
+    project.participants.add(request.user)
+    return redirect("projects:detail", project_id=project.id)
 
 
 @login_required(login_url="/users/login/")
@@ -91,18 +97,25 @@ def edit_project(request, project_id):
         raise Http404
     if project.owner != request.user and not request.user.is_staff:
         raise PermissionDenied
-    if request.method == "POST":
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            project = form.save()
-            return redirect("projects:detail", project_id=project.id)
-    else:
+
+    if request.method != "POST":
         form = ProjectForm(instance=project)
-    return render(
-        request,
-        "projects/create-project.html",
-        {"form": form, "is_edit": True},
-    )
+        return render(
+            request,
+            "projects/create-project.html",
+            {"form": form, "is_edit": True},
+        )
+
+    form = ProjectForm(request.POST, instance=project)
+    if not form.is_valid():
+        return render(
+            request,
+            "projects/create-project.html",
+            {"form": form, "is_edit": True},
+        )
+
+    project = form.save()
+    return redirect("projects:detail", project_id=project.id)
 
 
 @login_required(login_url="/users/login/")

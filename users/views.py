@@ -26,25 +26,29 @@ USER_NOT_FOUND_MESSAGE = "User not found."
 
 
 def register(request):
-    if request.method == "POST":
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("users:login")
-    else:
+    if request.method != "POST":
         form = RegisterForm()
-    return render(request, "users/register.html", {"form": form})
+        return render(request, "users/register.html", {"form": form})
+
+    form = RegisterForm(request.POST)
+    if not form.is_valid():
+        return render(request, "users/register.html", {"form": form})
+
+    form.save()
+    return redirect("users:login")
 
 
 def login_view(request):
-    if request.method == "POST":
-        form = LoginForm(request.POST, request=request)
-        if form.is_valid():
-            login(request, form.user)
-            return redirect("projects:list")
-    else:
+    if request.method != "POST":
         form = LoginForm(request=request)
-    return render(request, "users/login.html", {"form": form})
+        return render(request, "users/login.html", {"form": form})
+
+    form = LoginForm(request.POST, request=request)
+    if not form.is_valid():
+        return render(request, "users/login.html", {"form": form})
+
+    login(request, form.user)
+    return redirect("projects:list")
 
 
 def logout_view(request):
@@ -86,30 +90,38 @@ def user_detail(request, user_id):
 
 @login_required(login_url="/users/login/")
 def edit_profile(request):
-    if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect("users:detail", user_id=request.user.id)
-    else:
+    if request.method != "POST":
         form = ProfileForm(instance=request.user)
-    return render(
-        request,
-        "users/edit_profile.html",
-        {"form": form, "user": request.user},
-    )
+        return render(
+            request,
+            "users/edit_profile.html",
+            {"form": form, "user": request.user},
+        )
+
+    form = ProfileForm(request.POST, request.FILES, instance=request.user)
+    if not form.is_valid():
+        return render(
+            request,
+            "users/edit_profile.html",
+            {"form": form, "user": request.user},
+        )
+
+    form.save()
+    return redirect("users:detail", user_id=request.user.id)
 
 
 @login_required(login_url="/users/login/")
 def change_password(request):
-    if request.method == "POST":
-        form = UserPasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("users:detail", user_id=request.user.id)
-    else:
+    if request.method != "POST":
         form = UserPasswordChangeForm(request.user)
-    return render(request, "users/change_password.html", {"form": form})
+        return render(request, "users/change_password.html", {"form": form})
+
+    form = UserPasswordChangeForm(request.user, request.POST)
+    if not form.is_valid():
+        return render(request, "users/change_password.html", {"form": form})
+
+    form.save()
+    return redirect("users:detail", user_id=request.user.id)
 
 
 @require_GET
