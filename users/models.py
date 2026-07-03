@@ -1,7 +1,7 @@
 from io import BytesIO
 from uuid import uuid4
 
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractUser
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
@@ -30,6 +30,8 @@ class Skill(models.Model):
 
     class Meta:
         ordering = ("name",)
+        verbose_name = "Skill"
+        verbose_name_plural = "Skills"
 
     def __str__(self):
         return self.name
@@ -57,7 +59,11 @@ def build_default_avatar(initial):
     return ContentFile(buffer.getvalue())
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractUser):
+    username = None
+    first_name = None
+    last_name = None
+
     email = models.EmailField(verbose_name="Email", unique=True)
     name = models.CharField(verbose_name="Name", max_length=USER_NAME_MAX_LENGTH)
     surname = models.CharField(
@@ -104,6 +110,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         ordering = ("-date_joined", "-id")
+        verbose_name = "User"
+        verbose_name_plural = "Users"
 
     def __str__(self):
         return f"{self.name} {self.surname}".strip() or self.email
