@@ -12,27 +12,38 @@ class Project(models.Model):
         OPEN = "open", "Open"
         CLOSED = "closed", "Closed"
 
-    name = models.CharField("Name", max_length=PROJECT_NAME_MAX_LENGTH)
-    description = models.TextField("Description", blank=True)
+    name = models.CharField(verbose_name="Name", max_length=PROJECT_NAME_MAX_LENGTH)
+    description = models.TextField(verbose_name="Description", blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="Owner",
         on_delete=models.CASCADE,
         related_name="owned_projects",
     )
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    github_url = models.URLField("GitHub URL", blank=True)
+    created_at = models.DateTimeField(
+        verbose_name="Created at",
+        auto_now_add=True,
+        db_index=True,
+    )
+    github_url = models.URLField(verbose_name="GitHub URL", blank=True)
     status = models.CharField(
-        "Status",
+        verbose_name="Status",
         max_length=PROJECT_STATUS_MAX_LENGTH,
         choices=Status.choices,
         default=Status.OPEN,
     )
     participants = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
+        verbose_name="Participants",
         blank=True,
         related_name="participated_projects",
     )
-    skills = models.ManyToManyField(Skill, blank=True, related_name="projects")
+    skills = models.ManyToManyField(
+        Skill,
+        verbose_name="Skills",
+        blank=True,
+        related_name="projects",
+    )
 
     class Meta:
         ordering = ("-created_at", "-id")

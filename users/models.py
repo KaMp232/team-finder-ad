@@ -23,9 +23,9 @@ AVATAR_FILE_EXTENSION = "png"
 
 class Skill(models.Model):
     name = models.CharField(
+        verbose_name="Name",
         max_length=SKILL_NAME_MAX_LENGTH,
         unique=True,
-        db_index=True,
     )
 
     class Meta:
@@ -58,27 +58,44 @@ def build_default_avatar(initial):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
-    name = models.CharField(max_length=USER_NAME_MAX_LENGTH)
-    surname = models.CharField(max_length=USER_SURNAME_MAX_LENGTH)
-    avatar = models.ImageField(upload_to=avatar_upload_to)
+    email = models.EmailField(verbose_name="Email", unique=True)
+    name = models.CharField(verbose_name="Name", max_length=USER_NAME_MAX_LENGTH)
+    surname = models.CharField(
+        verbose_name="Surname",
+        max_length=USER_SURNAME_MAX_LENGTH,
+    )
+    avatar = models.ImageField(verbose_name="Avatar", upload_to=avatar_upload_to)
     phone = models.CharField(
+        verbose_name="Phone",
         max_length=USER_PHONE_MAX_LENGTH,
         blank=True,
         null=True,
         unique=True,
     )
-    github_url = models.URLField(blank=True)
-    about = models.TextField(max_length=USER_ABOUT_MAX_LENGTH, blank=True)
-    skills = models.ManyToManyField(Skill, blank=True, related_name="users")
+    github_url = models.URLField(verbose_name="GitHub URL", blank=True)
+    about = models.TextField(
+        verbose_name="About",
+        max_length=USER_ABOUT_MAX_LENGTH,
+        blank=True,
+    )
+    skills = models.ManyToManyField(
+        Skill,
+        verbose_name="Skills",
+        blank=True,
+        related_name="users",
+    )
     favorites = models.ManyToManyField(
         "projects.Project",
+        verbose_name="Favorite projects",
         blank=True,
         related_name="interested_users",
     )
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(default=timezone.now)
+    is_active = models.BooleanField(verbose_name="Active", default=True)
+    is_staff = models.BooleanField(verbose_name="Staff status", default=False)
+    date_joined = models.DateTimeField(
+        verbose_name="Date joined",
+        default=timezone.now,
+    )
 
     objects = UserManager()
 
