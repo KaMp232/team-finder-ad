@@ -3,14 +3,14 @@ import json
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 
-from .constants import ERROR_KEY, JSON_CONTENT_TYPE
+from .constants import JSON_CONTENT_TYPE
 
 PAGE_QUERY_PARAM = "page"
 FIRST_PAGE_NUMBER = 1
 
 
 def json_error(message, status):
-    return JsonResponse({ERROR_KEY: message}, status=status)
+    return JsonResponse({"error": message}, status=status)
 
 
 def paginate(request, queryset, per_page):

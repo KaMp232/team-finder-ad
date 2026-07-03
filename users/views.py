@@ -26,11 +26,10 @@ USER_NOT_FOUND_MESSAGE = "User not found."
 
 
 def register(request):
+    form = RegisterForm(request.POST or None)
     if request.method != "POST":
-        form = RegisterForm()
         return render(request, "users/register.html", {"form": form})
 
-    form = RegisterForm(request.POST)
     if not form.is_valid():
         return render(request, "users/register.html", {"form": form})
 
@@ -39,11 +38,10 @@ def register(request):
 
 
 def login_view(request):
+    form = LoginForm(request.POST or None, request=request)
     if request.method != "POST":
-        form = LoginForm(request=request)
         return render(request, "users/login.html", {"form": form})
 
-    form = LoginForm(request.POST, request=request)
     if not form.is_valid():
         return render(request, "users/login.html", {"form": form})
 
@@ -90,15 +88,18 @@ def user_detail(request, user_id):
 
 @login_required(login_url="/users/login/")
 def edit_profile(request):
+    form = ProfileForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=request.user,
+    )
     if request.method != "POST":
-        form = ProfileForm(instance=request.user)
         return render(
             request,
             "users/edit_profile.html",
             {"form": form, "user": request.user},
         )
 
-    form = ProfileForm(request.POST, request.FILES, instance=request.user)
     if not form.is_valid():
         return render(
             request,
@@ -112,11 +113,10 @@ def edit_profile(request):
 
 @login_required(login_url="/users/login/")
 def change_password(request):
+    form = UserPasswordChangeForm(request.user, request.POST or None)
     if request.method != "POST":
-        form = UserPasswordChangeForm(request.user)
         return render(request, "users/change_password.html", {"form": form})
 
-    form = UserPasswordChangeForm(request.user, request.POST)
     if not form.is_valid():
         return render(request, "users/change_password.html", {"form": form})
 

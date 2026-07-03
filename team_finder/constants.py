@@ -5,7 +5,6 @@ SKILL_QUERY_PARAM = "skill"
 SEARCH_QUERY_PARAM = "q"
 
 JSON_CONTENT_TYPE = "application/json"
-ERROR_KEY = "error"
 
 SKILL_NOT_FOUND_MESSAGE = "Skill not found."
 PERMISSION_DENIED_MESSAGE = "Permission denied."
