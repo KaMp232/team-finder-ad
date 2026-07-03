@@ -33,13 +33,13 @@ def project_list(request):
     active_skill = request.GET.get(SKILL_QUERY_PARAM)
     if active_skill:
         projects = projects.filter(skills__name=active_skill)
-    projects = projects.distinct().order_by("-created_at", "-id")
+    projects = projects.distinct()
     page_obj, query_prefix = paginate(request, projects, DEFAULT_PAGE_SIZE)
     context = {
         "projects": projects,
         "page_obj": page_obj,
         "query_prefix": query_prefix,
-        "all_skills": Skill.objects.values_list("name", flat=True).order_by("name"),
+        "all_skills": Skill.objects.values_list("name", flat=True),
         "active_skill": active_skill,
     }
     return render(request, "projects/project_list.html", context)
@@ -163,9 +163,7 @@ def toggle_favorite(request, project_id):
 @require_GET
 def skill_suggestions(request):
     query = request.GET.get(SEARCH_QUERY_PARAM, "")
-    skills = Skill.objects.filter(name__istartswith=query).order_by("name")[
-        :SKILL_SUGGESTIONS_LIMIT
-    ]
+    skills = Skill.objects.filter(name__istartswith=query)[:SKILL_SUGGESTIONS_LIMIT]
     return JsonResponse(list(skills.values("id", "name")), safe=False)
 
 

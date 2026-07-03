@@ -55,11 +55,7 @@ def logout_view(request):
 
 
 def user_list(request):
-    participants = (
-        User.objects.filter(is_active=True)
-        .prefetch_related("skills")
-        .order_by("-date_joined", "-id")
-    )
+    participants = User.objects.filter(is_active=True).prefetch_related("skills")
     active_skill = request.GET.get(SKILL_QUERY_PARAM)
     if active_skill:
         participants = participants.filter(skills__name=active_skill)
@@ -69,7 +65,7 @@ def user_list(request):
         "participants": participants,
         "page_obj": page_obj,
         "query_prefix": query_prefix,
-        "all_skills": Skill.objects.values_list("name", flat=True).order_by("name"),
+        "all_skills": Skill.objects.values_list("name", flat=True),
         "active_skill": active_skill,
     }
     return render(request, "users/participants.html", context)
@@ -127,9 +123,7 @@ def change_password(request):
 @require_GET
 def skill_suggestions(request):
     query = request.GET.get(SEARCH_QUERY_PARAM, "")
-    skills = Skill.objects.filter(name__istartswith=query).order_by("name")[
-        :SKILL_SUGGESTIONS_LIMIT
-    ]
+    skills = Skill.objects.filter(name__istartswith=query)[:SKILL_SUGGESTIONS_LIMIT]
     return JsonResponse(list(skills.values("id", "name")), safe=False)
 
 
