@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.contrib.auth.models import AbstractUser
 from django.core.files.base import ContentFile
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from PIL import Image, ImageDraw, ImageFont
 
@@ -75,8 +76,6 @@ class User(AbstractUser):
         verbose_name="Phone",
         max_length=USER_PHONE_MAX_LENGTH,
         blank=True,
-        null=True,
-        unique=True,
     )
     github_url = models.URLField(verbose_name="GitHub URL", blank=True)
     about = models.TextField(
@@ -112,6 +111,13 @@ class User(AbstractUser):
         ordering = ("-date_joined", "-id")
         verbose_name = "User"
         verbose_name_plural = "Users"
+        constraints = (
+            models.UniqueConstraint(
+                fields=("phone",),
+                condition=~Q(phone=""),
+                name="unique_non_empty_user_phone",
+            ),
+        )
 
     def __str__(self):
         return f"{self.name} {self.surname}".strip() or self.email

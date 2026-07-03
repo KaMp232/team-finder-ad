@@ -81,7 +81,7 @@ class ProfileForm(forms.ModelForm):
     def clean_phone(self):
         phone = normalize_phone(self.cleaned_data.get("phone"))
         if not phone:
-            return phone
+            return ""
         if not PHONE_RE.match(phone):
             raise forms.ValidationError(PHONE_INVALID_MESSAGE)
         users = User.objects.filter(phone=phone)
