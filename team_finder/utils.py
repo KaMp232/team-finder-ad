@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from .constants import ERROR_KEY, JSON_CONTENT_TYPE
 
 PAGE_QUERY_PARAM = "page"
+FIRST_PAGE_NUMBER = 1
 
 
 def json_error(message, status):
@@ -14,7 +15,7 @@ def json_error(message, status):
 
 def paginate(request, queryset, per_page):
     paginator = Paginator(queryset, per_page)
-    page_obj = paginator.get_page(request.GET.get(PAGE_QUERY_PARAM))
+    page_obj = paginator.get_page(request.GET.get(PAGE_QUERY_PARAM, FIRST_PAGE_NUMBER))
     params = request.GET.copy()
     params.pop(PAGE_QUERY_PARAM, None)
     query_prefix = params.urlencode()
