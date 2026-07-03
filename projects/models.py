@@ -8,12 +8,9 @@ PROJECT_STATUS_MAX_LENGTH = 6
 
 
 class Project(models.Model):
-    STATUS_OPEN = "open"
-    STATUS_CLOSED = "closed"
-    STATUS_CHOICES = (
-        (STATUS_OPEN, "Open"),
-        (STATUS_CLOSED, "Closed"),
-    )
+    class Status(models.TextChoices):
+        OPEN = "open", "Open"
+        CLOSED = "closed", "Closed"
 
     name = models.CharField(max_length=PROJECT_NAME_MAX_LENGTH)
     description = models.TextField(blank=True)
@@ -26,8 +23,8 @@ class Project(models.Model):
     github_url = models.URLField(blank=True)
     status = models.CharField(
         max_length=PROJECT_STATUS_MAX_LENGTH,
-        choices=STATUS_CHOICES,
-        default=STATUS_OPEN,
+        choices=Status.choices,
+        default=Status.OPEN,
     )
     participants = models.ManyToManyField(
         settings.AUTH_USER_MODEL,

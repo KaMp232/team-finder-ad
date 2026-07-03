@@ -118,8 +118,8 @@ def complete_project(request, project_id):
         return json_error(PROJECT_NOT_FOUND_MESSAGE, HTTPStatus.NOT_FOUND)
     if project.owner != request.user and not request.user.is_staff:
         return json_error(PERMISSION_DENIED_MESSAGE, HTTPStatus.FORBIDDEN)
-    if project.status == Project.STATUS_OPEN:
-        project.status = Project.STATUS_CLOSED
+    if project.status == Project.Status.OPEN:
+        project.status = Project.Status.CLOSED
         project.save(update_fields=("status",))
     return JsonResponse({"status": "ok", "project_status": project.status})
 
