@@ -12,16 +12,17 @@ class Project(models.Model):
         OPEN = "open", "Open"
         CLOSED = "closed", "Closed"
 
-    name = models.CharField(max_length=PROJECT_NAME_MAX_LENGTH)
-    description = models.TextField(blank=True)
+    name = models.CharField("Name", max_length=PROJECT_NAME_MAX_LENGTH)
+    description = models.TextField("Description", blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="owned_projects",
     )
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    github_url = models.URLField(blank=True)
+    github_url = models.URLField("GitHub URL", blank=True)
     status = models.CharField(
+        "Status",
         max_length=PROJECT_STATUS_MAX_LENGTH,
         choices=Status.choices,
         default=Status.OPEN,

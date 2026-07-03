@@ -16,12 +16,6 @@ class ProjectForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": PROJECT_DESCRIPTION_ROWS}),
             "github_url": forms.URLInput(attrs=GITHUB_WIDGET_ATTRS),
         }
-        labels = {
-            "name": "Name",
-            "description": "Description",
-            "github_url": "GitHub URL",
-            "status": "Status",
-        }
 
     def clean_github_url(self):
         github_url = self.cleaned_data.get("github_url")
